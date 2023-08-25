@@ -1,7 +1,7 @@
 # About
 
 A Chip-8 emulator, still being worked on, so it's not perfect\
-Currently implements imgui-rs to have a good looking ui for the debugger and etc
+Currently implements imgui-rs to have a good looking ui for the debugger and etc\
 Currently only supports the Original Chip-8 Variant, but I will add others soon
 
 ## Todo

@@ -214,8 +214,11 @@ async fn main() {
                         .add_filter("text", &["ch8"])
                         .pick_file()
                         .await;
-                    let data = file.unwrap().read().await;
-                    chip8_emu.load(&data[..]);
+
+                    if let Some(file) = file {
+                        let data = file.read().await;
+                        chip8_emu.load(&data[..]);
+                    }
                 }
                 if ui.menu_item("Close ROM") {
                     chip8_emu.unload();

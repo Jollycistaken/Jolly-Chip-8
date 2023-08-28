@@ -1,3 +1,5 @@
+use std::rc::Rc;
+use glow::{Context, HasContext, NativeTexture, TEXTURE_2D};
 use imgui::{DrawListMut, Ui};
 use rand::Rng;
 
@@ -29,12 +31,12 @@ pub struct Chip8 {
     delay_timer: u8,
     sound_timer: u8,
     v_regs: [u8; 16],
-    pub screen: [u8; 64*32],
-    pub display_screen: [u8; 64 * 32 * 3],
+    screen: [u8; 64*32],
+    display_screen: [u8; 64 * 32 * 3],
     pub keys: [bool; 16],
     loaded: bool,
     cycle: u16,
-    pub graphics_update: bool
+    graphics_update: bool
 }
 
 impl Chip8 {
@@ -362,7 +364,28 @@ impl Chip8 {
         }
     }
 
-    pub fn draw(&mut self) {
-        todo!()
+    pub fn draw(&mut self, renderer: &Rc<Context>, texture: NativeTexture) {
+        if !self.graphics_update {return}
+
+        for yl in 0..32 {
+            for xl in 0..64 {
+                let pixel_index = (xl + (yl * 64)) as usize;
+                if self.screen[pixel_index] != 0 {
+                    for i in 0..3 {
+                        self.display_screen[pixel_index * 3 + i] = 255;
+                    }
+                } else {
+                    for i in 0..3 {
+                        self.display_screen[pixel_index * 3 + i] = 0;
+                    }
+                }
+            }
+        }
+
+        unsafe {
+            renderer.bind_texture(TEXTURE_2D, Some(texture));
+            renderer.tex_image_2d(TEXTURE_2D, 0, glow::RGB as i32, 64, 32, 0, glow::RGB, glow::UNSIGNED_BYTE, Some(&self.display_screen));
+            renderer.bind_texture(TEXTURE_2D, None);
+        }
     }
 }
